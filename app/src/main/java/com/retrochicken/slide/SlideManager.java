@@ -57,8 +57,9 @@ public class SlideManager {
 
     private float size;
 
-    private int safeColor;
+    public static int safeColor;
     //private final double COLOR_CHANGE_THRESHOLD = 0;
+    public static int darkSafeColor;
 
     private int scoreTime;
     private int totalTime;
@@ -78,9 +79,10 @@ public class SlideManager {
     public SlideManager(int safeColor, Bitmap[] currencies, int[][] values) {
         tiles = new ArrayList<>();
         sizeGoal = (float)(3.0*Constants.SCREEN_HEIGHT/2.0);
+        //Modify to regain variable tile heights
         maxTileHeight = 5*Constants.Y_PIXELS_TO_INCH/8;
-        minTileHeight = Constants.Y_PIXELS_TO_INCH/2;
-        heightRandomScale = maxTileHeight - minTileHeight;
+        minTileHeight = maxTileHeight;//Constants.Y_PIXELS_TO_INCH/2;
+        heightRandomScale = 0;//maxTileHeight - minTileHeight;
         size = 0;
         SPEED_MAX = Constants.Y_PIXELS_TO_INCH/10;
         this.safeColor = safeColor;
@@ -98,6 +100,11 @@ public class SlideManager {
         }
         coinManager = new CoinManager(currencies, values, tileXPos, tileWidth);
         populateTiles();
+
+        float[] hsv = new float[3];
+        Color.colorToHSV(safeColor, hsv);
+        hsv[2] *= 0.8f; // value component
+        darkSafeColor = Color.HSVToColor(hsv);
     }
 
     public void update(long timeMillis) {
@@ -313,7 +320,7 @@ public class SlideManager {
     }
     public int swipeIndex(float x, float y) {
         if(x >= tileXPos && x <= tileXPos + tileWidth) {
-            //assumes bottom anchoring on rectangles
+            //assumes bottom anchoring on rectangle
             for(int i = 0; i < tiles.size(); i++) {
                 Tile temp  = tiles.get(i);
                 if(y <= temp.getY() && y >= temp.getY() - temp.getHeight())

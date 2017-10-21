@@ -138,10 +138,14 @@ public class GameplayScene implements Scene {
         }
     }
 
-    private void updateFadeTileWDelete(Tile t, float deltaX) {
+    private void updateFadeTileWDelete(Tile t, float deltaX, int index) {
         t.slideFade(deltaX);
         if (t.getAlpha() <= 0) {
-            slideManager.destroyTileByID(t.getID());
+            if(t.getIsBad())
+                t.swapStatus();
+            else
+                slideManager.destroyTileByID(t.getID());
+            deleteList.remove(index);
         }
     }
 
@@ -156,9 +160,7 @@ public class GameplayScene implements Scene {
             Tile t = deleteList.get(i);
             float prevDelt = t.getX() - t.getStartX();
             boolean isNeg = prevDelt < 0;
-            updateFadeTileWDelete(t, prevDelt + (isNeg ? -deltaXPerFrame : deltaXPerFrame));
-            if (t.getAlpha() <= 0)
-                deleteList.remove(i);
+            updateFadeTileWDelete(t, prevDelt + (isNeg ? -deltaXPerFrame : deltaXPerFrame), i);
         }
         if(slideManager.getDead()) {
             SceneManager.ACTIVE_SCENE = 2;
